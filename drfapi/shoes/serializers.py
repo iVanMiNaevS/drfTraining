@@ -1,3 +1,4 @@
+from email.policy import default
 from rest_framework import serializers
 from rest_framework.renderers import JSONRenderer
 
@@ -26,6 +27,7 @@ from .models import Sneakers
 #         return instance
 
 class SneakersSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     class Meta:
         model = Sneakers
         fields = "__all__"

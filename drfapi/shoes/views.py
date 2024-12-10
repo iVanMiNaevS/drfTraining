@@ -1,25 +1,57 @@
 from django.forms import model_to_dict
 from django.shortcuts import render
-from rest_framework import generics
+from rest_framework import generics, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAdminUser, IsAuthenticatedOrReadOnly
+
+from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 
 from .serializers import SneakersSerializer
-from .models import Sneakers
+from .models import Category, Sneakers
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
 # Create your views here.
 
+
+
+# class ShoesViewSet(viewsets.ModelViewSet):
+#     # queryset = Sneakers.objects.all()
+#     serializer_class = SneakersSerializer
+
+#     def get_queryset(self):
+#         pk = self.kwargs.get("pk")
+#         if not pk:
+#             return Sneakers.objects.all()[:3]
+        
+#         return Sneakers.objects.filter(pk=pk)
+    
+
+#     @action(methods=["get"], detail=True)   #http://127.0.0.1:8000/api/v1/shoeslist/2/category/
+#     def category(self, request, pk=None):
+#         cats = Category.objects.get(pk=pk)
+#         return Response({"cats": cats.name})
+
+
 class ShoesApiList(generics.ListCreateAPIView):
     queryset = Sneakers.objects.all()
     serializer_class = SneakersSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
-class ShoesApiUpdate(generics.UpdateAPIView):
+class ShoesApiUpdate(generics.RetrieveUpdateAPIView):
+    queryset = Sneakers.objects.all()
+    serializer_class = SneakersSerializer
+    permission_classes = (IsOwnerOrReadOnly,)
+
+class ShoesApiDestroy(generics.RetrieveDestroyAPIView):
     queryset = Sneakers.objects.all()
     serializer_class = SneakersSerializer
 
-class ShoesApiCrudView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Sneakers.objects.all()
-    serializer_class = SneakersSerializer
+    permission_classes=(IsAdminOrReadOnly,)
+
+# class ShoesApiCrudView(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Sneakers.objects.all()
+#     serializer_class = SneakersSerializer
 
 
 
